@@ -28,3 +28,9 @@ data/processed/champion_roles.json
 # Output de logs y resultados de pruebas
 output/
 resultados_pruebas.json 
+
+#estructura.txt
+estructura.txt
+
+#data/processed/json_limpios/
+data/processed/json_limpios/
