@@ -1,0 +1,16 @@
+# config/settings.yaml
+patch: "15.9"
+
+# Rutas de entrada
+raw_crudes_path: "data/raw"                       # JSON crudos (para extraer roles)
+limpios_path: "data/processed/json_limpios"       # JSON limpios (estadísticas + habilidades)
+
+# Archivos intermedios
+roles_output: "data/processed/champion_roles.json" # Generado por extract_roles.py
+
+# Archivos de salida
+mapping_output: "data/processed/champion_mapping.json"
+
+# Taxonomía
+taxonomy_path: "data/taxonomy/lol_taxonomy_v2.0.0.json"
+

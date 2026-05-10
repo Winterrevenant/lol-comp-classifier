@@ -1,0 +1,660 @@
+{
+  "meta": {
+    "version": "2.0.0",
+    "status": "DEFINITIVA",
+    "description": "Taxonomía definitiva para clasificador de composiciones enemigas en LoL. Consenso de 6 IAs + 2 rondas de revisión + auditoría automática de consistencia.",
+    "last_review_patch": "15.9",
+    "sources_merged": ["Claude", "Gemini", "Copilot", "ChatGPT", "Grok", "DeepSeek"],
+    "max_tags_per_champ": 2,
+    "note": "El orden de los tags importa: el primero es el rol dominante.",
+    "bugs_fixed_from_v1.2.0": [
+      "BUG-01: D1/D2 aparecían en categories.values pero no en scoring_model.base_weights. Solución: D1/D2 se trasladan a campo 'control_subtype' en champion_schema. Las categorías usan solo 'D' para scoring.",
+      "BUG-02: has_lifedrain no tenía flag_multiplier ni hint_tag explícito con condición clara. Solución: añadido multiplier en scoring_model y regla propia en hint_tag_detection.",
+      "BUG-03: is_splitpusher sin has_global_ult no generaba ningún hint_tag. Solución: añadido +SplitPushThreat como regla independiente.",
+      "BUG-04: No había fallback para campeones no clasificados en la DB. Solución: añadido unknown_champion_fallback en champion_schema."
+    ],
+    "changelog": {
+      "1.0.0": "Versión inicial consensuada de 5 fuentes.",
+      "1.1.0": "Integración DeepSeek v1: D1/D2 subtypes, has_lifedrain, proxy de nivel para fed_override.",
+      "1.2.0": "6 patches de revisión: absolute_threshold score-based, jerarquía fija como último recurso, Split_y_Colapso → hint_tag, calibration metadata, required/optional fields MVP, secondary_threats en output.",
+      "2.0.0": "Auditoría automática y corrección de 4 inconsistencias estructurales. Estado: DEFINITIVA."
+    }
+  },
+
+  "categories": {
+    "A": {
+      "id": "A",
+      "name": "BURST",
+      "description": "Daño explosivo capaz de eliminar un objetivo en menos de 2 segundos. Ventanas de combate cortas.",
+      "subtypes": {
+        "A1": {
+          "name": "BURST_ASSASSIN",
+          "description": "Daño letal en una sola rotación. Mata antes de que el objetivo reaccione.",
+          "examples": ["Zed", "Katarina", "Talon", "LeBlanc", "Rengar"]
+        },
+        "A2": {
+          "name": "EXECUTE",
+          "description": "Daño amplificado sobre objetivos con baja vida. No necesariamente inicia, pero remata.",
+          "examples": ["Pyke", "Darius", "Garen", "Urgot"]
+        }
+      },
+      "priority_weight": 1.35,
+      "counter_stat": "Flat_Health + Zhonya + Stopwatch",
+      "threat_signal": "Burst de oro y ventaja de kills en early. Escala con ítems de daño puro."
+    },
+    "B": {
+      "id": "B",
+      "name": "FRONTLINE",
+      "description": "Tanques, bruisers y drenadores de vida. Alta vida efectiva por tanqueo innato o sustain emergente a través del daño infligido. EHP superior a 2500 en mid-game.",
+      "examples": ["Ornn", "Sion", "Cho'Gath", "Dr. Mundo", "Malphite", "Volibear", "Swain", "Aatrox", "Mordekaiser"],
+      "priority_weight": 0.90,
+      "counter_stat": "Percent_Penetration + GrievousWounds + Kite",
+      "threat_signal": "Peligro bajo en aislamiento. Decisivo si no tienes respuesta a tanques o drenadores. GrievousWounds crítico cuando has_lifedrain=true."
+    },
+    "C": {
+      "id": "C",
+      "name": "SUSTAINED_DPS",
+      "description": "Daño continuo y creciente con el tiempo en combate. Incluye daño AD on-hit/AA y DPS mágico sostenido. Peligrosidad creciente cuanto más dura la pelea.",
+      "damage_subtypes": ["ad_sustained", "ap_sustained", "on_hit"],
+      "examples": ["Jinx", "Kog'Maw", "Vayne", "Vladimir", "Cassiopeia", "Sylas", "Master Yi", "Kindred"],
+      "priority_weight": 1.10,
+      "counter_stat": "Armor + AttackSpeed_Reduction + GrievousWounds (vs AP sustained)",
+      "threat_signal": "Peligro bajo en early. Crítico si la partida se alarga o el carry escala sin presión."
+    },
+    "D": {
+      "id": "D",
+      "name": "CONTROL",
+      "description": "Control de masas duro o blando. Stuns, roots, suppressions, desplazamientos forzados, silencios. Se subdivide en D1 (Initiation) y D2 (Peel/Zoning) con implicaciones defensivas opuestas. El scoring siempre usa el peso base de 'D'; el sub-tipo afecta hint_tags y secondary_threats.",
+      "subtypes": {
+        "D1": {
+          "name": "INITIATION",
+          "description": "CC para forzar peleas y liderar el engage. El campeón entra, agrupa y crea la ventana de combate.",
+          "defensive_implication": "Evitar agrupamiento. Priorizar disengage y visión. Ser el primero en morir = victoria enemiga.",
+          "hint_tag": "+InitiationThreat",
+          "examples": ["Leona", "Malphite", "Amumu", "Sejuani", "Jarvan IV", "Rakan", "Nautilus"]
+        },
+        "D2": {
+          "name": "PEEL_ZONING",
+          "description": "CC para proteger carries o controlar espacio defensivamente. Niega acceso a la backline sin iniciar.",
+          "defensive_implication": "El enemigo no busca teamfight frontal. Busca flanquear o dividir. Priorizar posicionamiento compacto.",
+          "hint_tag": "+PeelZoningThreat",
+          "examples": ["Janna", "Poppy", "Braum", "Taliyah", "Anivia", "Azir"]
+        }
+      },
+      "examples": ["Leona", "Nautilus", "Lissandra", "Ashe", "Morgana", "Amumu", "Sejuani", "Janna", "Poppy"],
+      "priority_weight": 1.40,
+      "counter_stat": "Tenacity + Quicksilver Sash + Disengage tools",
+      "threat_signal": "Mayor prioridad defensiva por defecto. Ver control_subtype del campeón para implicación específica."
+    },
+    "E": {
+      "id": "E",
+      "name": "POKE",
+      "description": "Daño intermitente a distancia segura. No matan en una rotación pero desgastan acumulativamente. No requieren compromiso total.",
+      "examples": ["Xerath", "Ziggs", "Jayce", "Ezreal", "Zoe", "Nidalee", "Hwei", "Lux"],
+      "priority_weight": 1.20,
+      "counter_stat": "Sustain_Items + Shields + Warmog + Hard_Engage_immediate",
+      "threat_signal": "No iniciar con vida baja. Sustain de línea crítico. Buscar engage duro cuando sea seguro."
+    },
+    "F": {
+      "id": "F",
+      "name": "ENCHANTER",
+      "description": "Enchanters y utilidad no letal. No generan amenaza directa pero multiplican la peligrosidad de un aliado específico. Su presencia transforma la clasificación de la composición completa.",
+      "examples": ["Lulu", "Janna", "Soraka", "Yuumi", "Taric", "Zilean", "Karma", "Nami"],
+      "priority_weight": 1.25,
+      "counter_stat": "Serpents_Fang + Shadowflame + Focus_Carry_First",
+      "threat_signal": "Override de composición. Si coexiste con 2+ C: Protect the Carry. El carry es el objetivo real, no el enchanter."
+    }
+  },
+
+  "champion_schema": {
+    "description": "Estructura de datos por campeón. Mantener en CSV/JSON maestro actualizado por parche.",
+    "required_fields_mvp": ["name", "champion_key", "categories", "control_subtype", "flags", "range_score", "mobility_score"],
+    "optional_fields": ["damage_type", "threat_timing", "primary_win_condition", "base_weight_override", "last_review_patch"],
+    "optional_fields_note": "Los campos opcionales pueden ser null o 'unknown' en el MVP. Se rellenarán progresivamente por parche o mediante inferencia desde la API de Riot.",
+    "unknown_champion_fallback": {
+      "description": "Si un campeón no existe en la DB, aplicar este perfil por defecto para no romper el motor.",
+      "categories": ["B"],
+      "control_subtype": null,
+      "flags": {
+        "is_melee": true,
+        "has_dash": false,
+        "has_global_ult": false,
+        "is_splitpusher": false,
+        "can_disengage": false,
+        "has_lifedrain": false
+      },
+      "range_score": 0,
+      "mobility_score": 0,
+      "damage_type": "unknown",
+      "threat_timing": "unknown",
+      "primary_win_condition": "unknown",
+      "hint_tags_forced": ["+UnknownChampion"],
+      "note": "Conservador: un campeón desconocido se asume como frontline básico. El hint_tag +UnknownChampion alerta al usuario de que el dato es inferido."
+    },
+    "fields": {
+      "name":         { "type": "string",  "required": true },
+      "champion_key": { "type": "string",  "required": true, "note": "Misma clave que la API de Riot." },
+      "categories": {
+        "type": "array<string>",
+        "required": true,
+        "max_length": 2,
+        "values": ["A", "B", "C", "D", "E", "F"],
+        "note": "Solo letras base A–F. El scoring usa base_weights sobre estas letras. El sub-tipo D1/D2 va en control_subtype. El primer elemento es el rol dominante."
+      },
+      "control_subtype": {
+        "type": "string | null",
+        "required": true,
+        "values": ["D1", "D2", null],
+        "note": "Solo aplicable si 'D' está en categories. Null para todos los demás. Determina el hint_tag de control (+InitiationThreat o +PeelZoningThreat) y el advice en secondary_threats."
+      },
+      "flags": {
+        "required": true,
+        "is_melee":       { "type": "boolean", "description": "Rango de ataque básico menor a 175 unidades." },
+        "has_dash":       { "type": "boolean", "description": "Posee gap closer o movilidad táctica en kit." },
+        "has_global_ult": { "type": "boolean", "description": "Ultimate o habilidad con alcance de mapa completo." },
+        "is_splitpusher": { "type": "boolean", "description": "Peligroso en presión 1v1 y destrucción de estructuras en sidelaneo." },
+        "can_disengage":  { "type": "boolean", "description": "Kit permite romper engages enemigos o proteger aliados de dive." },
+        "has_lifedrain":  { "type": "boolean", "description": "Sustain emergente a través del daño infligido (Vladimir Q, Swain R, Aatrox pasiva, Mundo R). GrievousWounds crítico independientemente de la categoría." }
+      },
+      "range_score": {
+        "type": "integer 0–3",
+        "required": true,
+        "values": { "0": "melee", "1": "short_range (<500)", "2": "mid_range (500–700)", "3": "artillery (>700)" }
+      },
+      "mobility_score": {
+        "type": "integer 0–3",
+        "required": true,
+        "values": { "0": "immobile", "1": "single_dash", "2": "multi_dash", "3": "global_mobility" }
+      },
+      "damage_type": {
+        "type": "string",
+        "required": false,
+        "values": ["ad_burst", "ap_burst", "ad_sustained", "ap_sustained", "on_hit", "poke", "execute", "none", "unknown"]
+      },
+      "threat_timing": {
+        "type": "string",
+        "required": false,
+        "values": ["early", "mid", "late", "always", "unknown"],
+        "note": "Ventana de juego en que el campeón es más peligroso."
+      },
+      "primary_win_condition": {
+        "type": "string",
+        "required": false,
+        "values": [
+          "engage_wombo", "pick_assassin", "scale_hypercarry", "protect_carry",
+          "poke_siege", "splitpush_pressure", "global_pressure",
+          "frontline_tank", "cc_lockdown", "execute_cleanup", "unknown"
+        ]
+      },
+      "last_review_patch": { "type": "string", "required": false },
+      "base_weight_override": {
+        "type": "object<category_id, float>",
+        "required": false,
+        "note": "Sobreescribe el base_weight global para este campeón específico."
+      }
+    },
+    "examples": [
+      {
+        "name": "Kai'Sa",
+        "champion_key": "kaisa",
+        "categories": ["C", "A"],
+        "control_subtype": null,
+        "flags": { "is_melee": false, "has_dash": true, "has_global_ult": false, "is_splitpusher": false, "can_disengage": false, "has_lifedrain": false },
+        "range_score": 2,
+        "mobility_score": 2,
+        "damage_type": "ad_sustained",
+        "threat_timing": "mid",
+        "primary_win_condition": "scale_hypercarry",
+        "last_review_patch": "15.9"
+      },
+      {
+        "name": "Leona",
+        "champion_key": "leona",
+        "categories": ["D", "B"],
+        "control_subtype": "D1",
+        "flags": { "is_melee": true, "has_dash": true, "has_global_ult": false, "is_splitpusher": false, "can_disengage": false, "has_lifedrain": false },
+        "range_score": 0,
+        "mobility_score": 1,
+        "damage_type": "none",
+        "threat_timing": "early",
+        "primary_win_condition": "cc_lockdown",
+        "last_review_patch": "15.9"
+      },
+      {
+        "name": "Janna",
+        "champion_key": "janna",
+        "categories": ["F", "D"],
+        "control_subtype": "D2",
+        "flags": { "is_melee": false, "has_dash": true, "has_global_ult": false, "is_splitpusher": false, "can_disengage": true, "has_lifedrain": false },
+        "range_score": 2,
+        "mobility_score": 1,
+        "damage_type": "none",
+        "threat_timing": "always",
+        "primary_win_condition": "protect_carry",
+        "last_review_patch": "15.9"
+      },
+      {
+        "name": "Vladimir",
+        "champion_key": "vladimir",
+        "categories": ["C", "B"],
+        "control_subtype": null,
+        "flags": { "is_melee": false, "has_dash": true, "has_global_ult": false, "is_splitpusher": false, "can_disengage": false, "has_lifedrain": true },
+        "range_score": 1,
+        "mobility_score": 1,
+        "damage_type": "ap_sustained",
+        "threat_timing": "late",
+        "primary_win_condition": "scale_hypercarry",
+        "last_review_patch": "15.9"
+      },
+      {
+        "name": "Kindred",
+        "champion_key": "kindred",
+        "categories": ["C"],
+        "control_subtype": null,
+        "flags": { "is_melee": false, "has_dash": true, "has_global_ult": false, "is_splitpusher": false, "can_disengage": false, "has_lifedrain": false },
+        "range_score": 2,
+        "mobility_score": 2,
+        "damage_type": "on_hit",
+        "threat_timing": "mid",
+        "primary_win_condition": "scale_hypercarry",
+        "last_review_patch": "15.9"
+      }
+    ]
+  },
+
+  "scoring_model": {
+    "description": "Suma ponderada de pesos base por categoría más multiplicadores por flags. Devuelve clasificación primaria, secundaria y nivel de confianza.",
+    "base_weights": {
+      "A": 1.35,
+      "B": 0.90,
+      "C": 1.10,
+      "D": 1.40,
+      "E": 1.20,
+      "F": 1.25
+    },
+    "calibration": {
+      "status": "heuristic_v1",
+      "recommended_action": "Validar con dataset de >= 10 000 partidas de soloQ. Ajustar pesos mediante regresión logística o comparación con etiquetas humanas.",
+      "sensitivity_note": "Diferencias de score < 0.2 entre categorías pueden ser ruido estadístico. No forzar clasificación: presentar top 2 y marcar confianza como 'Composición mixta'."
+    },
+    "flag_multipliers": {
+      "has_global_ult": {
+        "effect": "Aumenta peso de la categoría principal del campeón.",
+        "multiplier": 1.20
+      },
+      "has_dash": {
+        "effect": "Aumenta peligrosidad de A y D.",
+        "category_multipliers": { "A": 1.10, "D": 1.10 }
+      },
+      "range_score_3": {
+        "trigger": "range_score == 3",
+        "effect": "Aumenta peso de E.",
+        "category_multipliers": { "E": 1.25 }
+      },
+      "can_disengage": {
+        "effect": "Aumenta peso de F y reduce relativo de A.",
+        "category_multipliers": { "F": 1.15, "A": 0.90 }
+      },
+      "has_lifedrain": {
+        "effect": "Aumenta el peso de B para reflejar que el campeón tiene durabilidad emergente adicional. No afecta a C directamente.",
+        "category_multipliers": { "B": 1.15 },
+        "note": "GrievousWounds se vuelve prioritario independientemente de la categoría. El hint_tag +LifeDrainThreat se activa automáticamente."
+      }
+    },
+    "detection_thresholds": {
+      "min_for_strong":  2.5,
+      "min_for_present": 1.8,
+      "note": "Scores ponderados totales por categoría. Por encima de min_for_strong activa el umbral absoluto y se considera amenaza primaria."
+    },
+    "fed_override": {
+      "description": "Multiplicador aplicado a las categorías del campeón fed. Puede cambiar la clasificación estática.",
+      "default_multiplier": 1.50,
+      "cap": 2.0,
+      "status": "Planificado post-MVP. Prioridad 9 en implementation_priorities.",
+      "triggers": [
+        {
+          "condition": "gold_advantage >= 3000",
+          "effect": "Aplica fed_multiplier a todas las categorías del campeón.",
+          "data_source": "API Riot — requiere datos internos de partida."
+        },
+        {
+          "condition": "level >= team_avg_level + 2",
+          "effect": "Aplica fed_multiplier. Proxy implementable desde el marcador público visible.",
+          "data_source": "Marcador visible — no requiere API interna."
+        },
+        {
+          "condition": "kills >= 8 AND category includes A",
+          "effect": "force_burst_alert — override de prioridad defensiva."
+        },
+        {
+          "condition": "core_items_completed >= 3 AND category includes C",
+          "effect": "force_dps_scaling_alert — el carry escala, priorizar cierre de partida."
+        }
+      ]
+    },
+    "confidence": {
+      "calculation": "score_top_category / sum(all_scores)",
+      "thresholds": {
+        "high":   { "min": 0.75, "label": "Composición clara" },
+        "medium": { "min": 0.50, "label": "Tendencia identificada" },
+        "low":    { "min": 0.00, "label": "Composición mixta — presentar top 2" }
+      }
+    }
+  },
+
+  "composition_rules": {
+    "absolute_threshold": {
+      "type": "score_based",
+      "min_score": 2.5,
+      "description": "Una categoría se considera Absoluta si su score ponderado total >= 2.5. Evita falsos positivos con campeones multi-categoría: el conteo binario falla cuando una categoría secundaria débil acumula apariciones pero con bajo peso real.",
+      "confidence_forced": 1.0
+    },
+    "priority_hierarchy": {
+      "description": "Jerarquía de desempate editorial. Solo se activa cuando la diferencia de scores entre las dos categorías principales es <= 0.2 (zona de ruido estadístico). Fuera de ese rango se usa directamente la categoría de mayor score.",
+      "activation_condition": "abs(score_top1 - score_top2) <= 0.2",
+      "fallback_if_no_condition": "Usar categoría con mayor score sin jerarquía.",
+      "fallback_if_total_tie": "Mostrar ambas categorías. Marcar confidence_label: 'Composición mixta' y tiebreaker_method: 'hierarchy'.",
+      "phase_modifiers": {
+        "status": "Documentado pero desactivado hasta que fed_override (prioridad 9) esté implementado.",
+        "early_mid": ["D", "A", "E", "F", "C", "B"],
+        "late":      ["A", "C", "D", "F", "E", "B"],
+        "activation_note": "Activar con minuto de partida como input. Antes de minuto 25 = early_mid. Después = late."
+      },
+      "limitations": [
+        "La jerarquía es una apuesta editorial, no una certeza técnica. Solo válida como último recurso.",
+        "D+F tiene prioridad distinta a D puro. Sin las reglas de sinergia híbrida, no se distingue.",
+        "C queda subestimado en late game frente a B. Corregir con phase_modifier late cuando esté activo."
+      ]
+    },
+    "hybrid_synergies": {
+      "evaluation_order": "Evaluar de arriba a abajo. Primera sinergia que aplica = resultado. Protect_the_Carry siempre se evalúa primero por is_override=true.",
+      "Protect_the_Carry": {
+        "required": ["F", "C"],
+        "min_F": 1,
+        "min_C": 2,
+        "description": "Enchanter amplifica a uno o más carries de DPS.",
+        "priority_advice": "Focus único al carry. Ignorar tanques y enchanters. Serpent's Fang prioritario.",
+        "is_override": true
+      },
+      "Captura": {
+        "required": ["D", "A"],
+        "description": "CC para inmovilizar + burst para rematar. Pick composition clásica.",
+        "priority_advice": "Nunca aislarse. Rotar siempre en grupo. Evitar líneas sin visión."
+      },
+      "Asedio_Teamfight": {
+        "required": ["D", "B"],
+        "description": "Frontline con CC fuerza objetivos con control.",
+        "priority_advice": "Construir disengage. No ceder espacio gratuito en objetivos."
+      },
+      "Front_to_Back": {
+        "required": ["C", "B"],
+        "description": "Tanques absorben mientras los DPS hacen daño sostenido desde atrás.",
+        "priority_advice": "Percent penetration y anti-tank prioritarios. Kite y separar frontline de backline."
+      },
+      "Bunker_Pasivo": {
+        "required": ["F", "B"],
+        "min_F": 1,
+        "min_B": 2,
+        "description": "Tanques con soporte de curación y escudo. Composición de largo aliento.",
+        "priority_advice": "GrievousWounds obligatorio. Forzar peleas cortas. No prolongar el combate."
+      },
+      "Poke_al_Engage": {
+        "required": ["E", "D"],
+        "min_E": 2,
+        "min_D": 1,
+        "description": "Desgastan con poke antes de cerrar con CC.",
+        "priority_advice": "No iniciar con vida baja. Sustain de línea crítico. Buscar hard engage cuando sea seguro."
+      }
+    },
+    "hint_tag_detection": {
+      "description": "Patrones detectados por flags individuales que no constituyen identidad primaria. Se añaden al campo hint_tags[] del output en el paso 13 del algoritmo.",
+      "rules": [
+        {
+          "tag": "+InitiationThreat",
+          "condition": "any champion has control_subtype == 'D1'",
+          "advice": "CC que fuerza peleas. Evitar agrupamiento. Priorizar disengage y visión de flancos."
+        },
+        {
+          "tag": "+PeelZoningThreat",
+          "condition": "any champion has control_subtype == 'D2'",
+          "advice": "CC defensivo. El enemigo protege a su carry. No asumir teamfight frontal — buscan dividir."
+        },
+        {
+          "tag": "+SplitPushThreat",
+          "condition": "any champion has is_splitpusher == true",
+          "advice": "Amenaza de sidelaneo. Visión en carriles laterales. No ignorar el split aunque haya peleas."
+        },
+        {
+          "tag": "+GlobalSplitThreat",
+          "condition": "any champion has is_splitpusher == true AND any champion has has_global_ult == true",
+          "advice": "Split + colapso global. El splitpusher presiona y el global rota cuando hay teamfight. Rotar rápido."
+        },
+        {
+          "tag": "+GlobalPresence",
+          "condition": "count(has_global_ult == true) >= 2",
+          "advice": "Dos o más campeones con alcance global. Jugar cerca del equipo. Evitar soloq en objetivos."
+        },
+        {
+          "tag": "+LifeDrainThreat",
+          "condition": "any champion has has_lifedrain == true",
+          "advice": "GrievousWounds prioritario aunque la categoría primaria no sea C. Aplica a Vladimir, Swain, Aatrox, Mundo."
+        },
+        {
+          "tag": "+UnknownChampion",
+          "condition": "any champion not found in champion_db",
+          "advice": "Campeón sin clasificar. Se asume perfil conservador (Frontline B). Validar manualmente."
+        },
+        {
+          "tag": "+FedAlert",
+          "condition": "fed_override activado para algún campeón",
+          "advice": "La amenaza real puede diferir de la clasificación estática. Ver campo fed_alert."
+        }
+      ]
+    },
+    "override_priority": [
+      "Protect_the_Carry > jerarquía fija (is_override: true)",
+      "score >= 2.5 (score_based absolute) > conteo de apariciones",
+      "fed_override > clasificación estática (cuando esté implementado)"
+    ]
+  },
+
+  "output_schema": {
+    "description": "Estructura de respuesta del clasificador. Diseñada para consumo directo por la UI.",
+    "fields": {
+      "primary_identity":    "string — nombre de la composición detectada",
+      "secondary_identity":  "string | null — identidad secundaria si confianza es media o baja",
+      "scores":              "object<category_id, float> — scores ponderados por categoría A–F",
+      "confidence":          "float 0..1",
+      "confidence_label":    "string — 'Composición clara' | 'Tendencia identificada' | 'Composición mixta'",
+      "tiebreaker_method":   "string | null — 'hierarchy' si la jerarquía fija fue el desempate. null si el score fue determinante.",
+      "is_absolute":         "boolean — true si alguna categoría superó min_score 2.5",
+      "recommended_defense": {
+        "anti_burst":    "boolean",
+        "anti_dps":      "boolean",
+        "anti_cc":       "boolean — priorizar Tenacity / QSS",
+        "anti_poke":     "boolean — priorizar sustain y Warmog",
+        "anti_dive":     "boolean — priorizar disengage y peel",
+        "focus_carry":   "boolean — ignorar tanques, eliminar carry primero",
+        "grievous_wounds_priority": "boolean — true si algún campeón tiene has_lifedrain=true"
+      },
+      "secondary_threats": {
+        "type": "array<object> | null",
+        "description": "Campeones individuales que requieren atención defensiva específica aunque no cambien la identidad primaria.",
+        "item_schema": {
+          "champion": "string",
+          "category": "string (A–F)",
+          "control_subtype": "string | null (D1 | D2)",
+          "advice": "string — consejo específico de build o decisión de juego"
+        }
+      },
+      "hint_tags":   "array<string> — anotaciones de flags especiales del equipo",
+      "fed_alert":   "object | null — información del campeón fed si aplica"
+    },
+    "example": {
+      "enemy_team": ["Leona", "Zed", "Kog'Maw", "Ornn", "Lulu"],
+      "output": {
+        "primary_identity":   "Protect_the_Carry",
+        "secondary_identity": "Captura",
+        "scores": { "A": 1.35, "B": 0.90, "C": 1.10, "D": 1.40, "E": 0.00, "F": 1.25 },
+        "confidence":       0.68,
+        "confidence_label": "Tendencia identificada",
+        "tiebreaker_method": null,
+        "is_absolute": false,
+        "recommended_defense": {
+          "anti_burst":              true,
+          "anti_dps":                true,
+          "anti_cc":                 true,
+          "anti_poke":               false,
+          "anti_dive":               false,
+          "focus_carry":             true,
+          "grievous_wounds_priority": false
+        },
+        "secondary_threats": [
+          {
+            "champion": "Zed",
+            "category": "A",
+            "control_subtype": null,
+            "advice": "Zhonya o Stopwatch temprano. Cuidado con flanqueos desde carril lateral."
+          },
+          {
+            "champion": "Leona",
+            "category": "D",
+            "control_subtype": "D1",
+            "advice": "D1 Initiation. Tenacidad y disengage. No agruparse cuando tenga ulti disponible."
+          }
+        ],
+        "hint_tags": ["+InitiationThreat"],
+        "fed_alert": null
+      }
+    }
+  },
+
+  "algorithm_pseudocode": {
+    "description": "Lógica de clasificación paso a paso. O(n) por campeón, O(1) lookups en la DB.",
+    "steps": [
+      "1.  Para cada campeón enemigo, buscar su perfil en champion_db. Si no existe, usar unknown_champion_fallback y marcar hint_tag +UnknownChampion.",
+      "2.  Inicializar scores = { A:0, B:0, C:0, D:0, E:0, F:0 }.",
+      "3.  Para cada categoría del campeón (solo letras base A–F): weight = base_weights[cat] * (base_weight_override si existe).",
+      "4.  Aplicar flag_multipliers: iterar sobre flags activos del campeón y multiplicar el peso de las categorías afectadas.",
+      "5.  scores[cat] += weight acumulado.",
+      "6.  Si fed_info disponible: scores[cat] *= min(fed_multiplier, cap) para las categorías del campeón fed.",
+      "7.  Verificar si alguna categoría tiene score >= 2.5 (absolute_threshold.min_score). Si sí: resultado Absoluto, confidence = 1.0, saltar al paso 11.",
+      "8.  Evaluar hybrid_synergies en orden (Protect_the_Carry primero). Primera sinergia que aplica = primary_identity.",
+      "9.  Si ninguna sinergia aplica: primary_identity = categoría con mayor score.",
+      "10. Verificar si abs(score_top1 - score_top2) <= 0.2. Si sí: aplicar jerarquía fija como desempate y marcar tiebreaker_method: 'hierarchy'. Si no: usar mayor score directamente.",
+      "11. Calcular confidence = score_top / sum(scores). Asignar confidence_label según thresholds.",
+      "12. Poblar recommended_defense según primary_identity. Activar grievous_wounds_priority si algún campeón tiene has_lifedrain=true.",
+      "13. Evaluar hint_tag_detection.rules. Añadir tags correspondientes a hint_tags[].",
+      "14. Construir secondary_threats: para cada campeón cuya categoría o control_subtype genera un riesgo individual que no está cubierto por la primary_identity, añadir entrada con advice específico.",
+      "15. Retornar output_schema completo."
+    ]
+  },
+
+  "implementation_priorities": [
+    {
+      "priority": 0,
+      "action": "Implementar los fixes de v2.0.0 (control_subtype, has_lifedrain multiplier, +SplitPushThreat, unknown_champion_fallback)",
+      "reason": "Correcciones de bugs estructurales. No son features, son consistencia del motor.",
+      "effort": "bajo"
+    },
+    {
+      "priority": 1,
+      "action": "Implementar categoría F (ENCHANTER) y regla Protect_the_Carry",
+      "reason": "Override crítico. Sin esto, Lulu+Jinx se clasifica igual que cualquier comp mixta.",
+      "effort": "bajo"
+    },
+    {
+      "priority": 2,
+      "action": "Añadir counter_stat por categoría en la UI",
+      "reason": "Conecta directamente la clasificación con la sugerencia de build.",
+      "effort": "bajo"
+    },
+    {
+      "priority": 3,
+      "action": "Implementar scoring ponderado con confidence score",
+      "reason": "Reemplaza jerarquía fija con un sistema más robusto y transparente.",
+      "effort": "medio"
+    },
+    {
+      "priority": 4,
+      "action": "Poblar champion_db con los campos required_fields_mvp para todos los campeones",
+      "reason": "Sin la DB, el motor usa siempre el unknown_champion_fallback.",
+      "effort": "alto — proceso editorial; ~165 campeones"
+    },
+    {
+      "priority": 5,
+      "action": "Añadir range_score, mobility_score y flags en la DB",
+      "reason": "Permiten flag_multipliers y hint_tags. Mejoran detección de comps de poke, engage y splitpush.",
+      "effort": "medio — parte del proceso editorial de prioridad 4"
+    },
+    {
+      "priority": 6,
+      "action": "Implementar secondary_threats en el output y renderizarlo en la UI",
+      "reason": "Mayor valor defensivo por partida: consejo específico por campeón, no solo por composición.",
+      "effort": "medio"
+    },
+    {
+      "priority": 7,
+      "action": "Añadir last_review_patch a todos los campeones",
+      "reason": "Mantenibilidad. Reworks invalidan clasificaciones sin aviso.",
+      "effort": "bajo"
+    },
+    {
+      "priority": 8,
+      "action": "Rellenar campos opcionales (damage_type, threat_timing, primary_win_condition) progresivamente",
+      "reason": "No bloquean el MVP pero mejoran granularidad del scoring y secondary_threats.",
+      "effort": "medio — proceso editorial por parche"
+    },
+    {
+      "priority": 9,
+      "action": "Implementar fed_override dinámico y activar phase_modifiers",
+      "reason": "Requiere integración con Live Game API de Riot. Desbloquea también las phase_modifiers de la jerarquía.",
+      "effort": "alto"
+    },
+    {
+      "priority": 10,
+      "action": "Template matching como sistema paralelo de validación",
+      "reason": "Sanity check del scoring ponderado para comps meta canónicas.",
+      "effort": "medio"
+    },
+    {
+      "priority": 11,
+      "action": "Calibración empírica de pesos con dataset real",
+      "reason": "Pesos actuales son heurísticos v1. Validar con >= 10 000 partidas.",
+      "effort": "alto — requiere pipeline de datos y etiquetado"
+    }
+  ],
+
+  "rejected_decisions": [
+    {
+      "source": "Grok",
+      "idea": "Fusionar POKE y ENCHANTER en POKE_UTILITY",
+      "reason": "Pierde la distinción crítica entre amenaza de desgaste (E) y multiplicación de carry (F). Impide detectar Protect_the_Carry."
+    },
+    {
+      "source": "Gemini",
+      "idea": "Condiciones de composición como floats (sum_C: 3.5)",
+      "reason": "Opacas para reglas de negocio. Preferir umbrales explícitos alineados con detection_thresholds."
+    },
+    {
+      "source": "DeepSeek v1",
+      "idea": "Reducir a 5 categorías fusionando POKE en el resto",
+      "reason": "Perder POKE como categoría independiente impide detectar Poke Siege Absoluta y la sinergia Poke_al_Engage."
+    },
+    {
+      "source": "DeepSeek v1",
+      "idea": "Pesos continuos 0–1 por campeón como campo obligatorio desde MVP",
+      "reason": "Costo editorial inasumible para 160+ campeones. Campo opcional en evolución futura."
+    },
+    {
+      "source": "ChatGPT",
+      "idea": "Schema multi-layer completo con scores numéricos por perfil como campo obligatorio",
+      "reason": "Demasiado costoso de mantener para 160+ campeones. Campo opcional para campeones clave en implementación futura."
+    },
+    {
+      "source": "Interno v1.x",
+      "idea": "D1/D2 como valores válidos en categories[]",
+      "reason": "Bug estructural: scoring_model no tenía pesos para D1/D2. Corrección en v2.0.0: categories usa solo letras base A–F; D1/D2 van en campo control_subtype."
+    }
+  ]
+}

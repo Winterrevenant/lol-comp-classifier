@@ -1,0 +1,261 @@
+{
+    "nombre": "Tryndamere",
+    "stats_base": {
+        "Vida": 696.0,
+        "Vida_por_nivel": 108.0,
+        "Regen_Vida": 1.7000000476837158,
+        "Regen_Vida_por_nivel": 0.18000000715255737,
+        "Daño_Ataque": 66.0,
+        "Daño_Ataque_por_nivel": 4.5,
+        "Armadura": 33.0,
+        "Armadura_por_nivel": 4.800000190734863,
+        "Resistencia_Magica_por_nivel": 2.049999952316284,
+        "Vel_Movimiento": 345.0,
+        "Rango_Ataque": 175.0,
+        "Vel_Ataque_base": 0.6700000166893005,
+        "Vel_Ataque_ratio": 0.7250000238418579,
+        "Vel_Ataque_por_nivel": 3.4000000953674316,
+        "Regen_Mana": 0.0
+    },
+    "habilidades": {
+        "Q": {
+            "nombre": "TryndamereQAbility/TryndamereQ",
+            "cooldown": [
+                12.0,
+                12.0,
+                12.0,
+                12.0,
+                12.0,
+                12.0,
+                12.0
+            ],
+            "costo_mana": [],
+            "rango": [],
+            "daño_base": [],
+            "escalado_1": 0.30000001192092896,
+            "escalado_2": 0.012000000104308128,
+            "parametros_extra": {
+                "BaseHealing": [
+                    20.0,
+                    30.0,
+                    40.0,
+                    50.0,
+                    60.0,
+                    70.0,
+                    80.0
+                ],
+                "BonusHealPerFury": [
+                    0.05000000074505806,
+                    0.5,
+                    0.949999988079071,
+                    1.399999976158142,
+                    1.850000023841858,
+                    2.299999952316284,
+                    2.75
+                ],
+                "MaximumBonusAD": [
+                    5.0,
+                    20.0,
+                    35.0,
+                    50.0,
+                    65.0,
+                    80.0,
+                    95.0
+                ],
+                "RemainingHealthThreshold": [
+                    0.10000000149011612,
+                    0.10000000149011612,
+                    0.10000000149011612,
+                    0.10000000149011612,
+                    0.10000000149011612,
+                    0.10000000149011612,
+                    0.10000000149011612
+                ]
+            }
+        },
+        "W": {
+            "nombre": "TryndamereWAbility/TryndamereW",
+            "cooldown": [
+                14.0,
+                14.0,
+                14.0,
+                14.0,
+                14.0,
+                14.0,
+                14.0
+            ],
+            "costo_mana": [],
+            "rango": [],
+            "daño_base": [],
+            "escalado_1": 0.0,
+            "escalado_2": 0.0,
+            "parametros_extra": {
+                "ADReduction": [
+                    -5.0,
+                    -20.0,
+                    -35.0,
+                    -50.0,
+                    -65.0,
+                    -80.0,
+                    -95.0
+                ],
+                "SlowPotency": [
+                    -0.25,
+                    -0.30000001192092896,
+                    -0.3499999940395355,
+                    -0.4000000059604645,
+                    -0.44999998807907104,
+                    -0.5,
+                    -0.550000011920929
+                ],
+                "ReductionDuration": [
+                    4.0,
+                    4.0,
+                    4.0,
+                    4.0,
+                    4.0,
+                    4.0,
+                    4.0
+                ],
+                "SlowDuration": [
+                    3.25,
+                    3.25,
+                    3.25,
+                    3.25,
+                    3.25,
+                    3.25,
+                    3.25
+                ]
+            }
+        },
+        "E": {
+            "nombre": "TryndamereEAbility/TryndamereE",
+            "cooldown": [
+                12.0,
+                12.0,
+                11.0,
+                10.0,
+                9.0,
+                8.0,
+                7.0
+            ],
+            "costo_mana": [],
+            "rango": [
+                25000.0,
+                25000.0,
+                25000.0,
+                25000.0,
+                25000.0,
+                25000.0,
+                25000.0
+            ],
+            "daño_base": [
+                40.0,
+                80.0,
+                120.0,
+                160.0,
+                200.0,
+                240.0,
+                280.0
+            ],
+            "escalado_1": 1.0,
+            "escalado_2": 0.800000011920929,
+            "parametros_extra": {
+                "NonChampCDRefund": [
+                    0.75,
+                    0.75,
+                    0.75,
+                    0.75,
+                    0.75,
+                    0.75,
+                    0.75
+                ],
+                "ChampCDRefund": [
+                    1.5,
+                    1.5,
+                    1.5,
+                    1.5,
+                    1.5,
+                    1.5,
+                    1.5
+                ],
+                "NonChampFuryGain": [
+                    2.0,
+                    2.0,
+                    2.0,
+                    2.0,
+                    2.0,
+                    2.0,
+                    2.0
+                ],
+                "ChampFuryGain": [
+                    5.0,
+                    5.0,
+                    5.0,
+                    5.0,
+                    5.0,
+                    5.0,
+                    5.0
+                ]
+            }
+        },
+        "R": {
+            "nombre": "UndyingRageAbility/UndyingRage",
+            "cooldown": [
+                120.0,
+                120.0,
+                100.0,
+                80.0,
+                80.0,
+                80.0,
+                80.0
+            ],
+            "costo_mana": [],
+            "rango": [],
+            "daño_base": [
+                50.0,
+                50.0,
+                75.0,
+                100.0,
+                100.0,
+                100.0,
+                100.0
+            ],
+            "escalado_1": 0.0,
+            "escalado_2": 0.0,
+            "parametros_extra": {
+                "TryndRFuryGain": [
+                    50.0,
+                    50.0,
+                    75.0,
+                    100.0,
+                    125.0,
+                    150.0,
+                    175.0
+                ],
+                "TryndRMinHealth": [
+                    30.0,
+                    30.0,
+                    50.0,
+                    70.0,
+                    90.0,
+                    110.0,
+                    130.0
+                ],
+                "TryndRDuration": [
+                    5.0,
+                    5.0,
+                    5.0,
+                    5.0,
+                    5.0,
+                    5.0,
+                    5.0
+                ]
+            }
+        }
+    },
+    "pasiva": {
+        "nombre": "TryndamerePassiveAbility",
+        "descripcion": "game_buff_tooltip_TryndamerePassive"
+    }
+}

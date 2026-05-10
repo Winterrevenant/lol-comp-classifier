@@ -1,0 +1,30 @@
+# Entorno virtual
+venv/
+
+# Archivos de caché de Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Archivos de configuración de IDE
+.vscode/
+.idea/
+
+# Archivos del sistema operativo
+Thumbs.db
+.DS_Store
+
+# Archivos de secretos
+config/secrets.yaml
+.env
+
+# Archivos generados (se regeneran con scripts)
+data/processed/champion_mapping.json
+data/processed/champion_roles.json
+
+# Archivos CSV de análisis de partidas (se generan dinámicamente)
+*.csv
+
+# Output de logs y resultados de pruebas
+output/
+resultados_pruebas.json 

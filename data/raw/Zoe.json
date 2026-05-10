@@ -1,0 +1,339 @@
+{
+  "entries": {
+    "type": "map",
+    "value": {
+      "items": [
+        {
+          "key": "Characters/TrundleWall/CharacterRecords/Root",
+          "value": {
+            "items": [
+              {
+                "key": "mCharacterName",
+                "type": "string",
+                "value": "TrundleWall"
+              },
+              {
+                "key": 2254622482,
+                "type": "embed",
+                "value": {
+                  "items": [
+                    {
+                      "key": 3009062761,
+                      "type": "f32",
+                      "value": 500.0
+                    }
+                  ],
+                  "name": 3466301819
+                }
+              },
+              {
+                "key": 1295494952,
+                "type": "embed",
+                "value": {
+                  "items": [
+                    {
+                      "key": 3009062761,
+                      "type": "f32",
+                      "value": 150.0
+                    }
+                  ],
+                  "name": 3466301819
+                }
+              },
+              {
+                "key": 2666392493,
+                "type": "embed",
+                "value": {
+                  "items": [
+                    {
+                      "key": 3009062761,
+                      "type": "f32",
+                      "value": 0.5
+                    }
+                  ],
+                  "name": 3466301819
+                }
+              },
+              {
+                "key": 579927194,
+                "type": "embed",
+                "value": {
+                  "items": [
+                    {
+                      "key": 3009062761,
+                      "type": "f32",
+                      "value": 0.001500000013038516
+                    }
+                  ],
+                  "name": 3466301819
+                }
+              },
+              {
+                "key": "PrimaryAbilityResource",
+                "type": "embed",
+                "value": {
+                  "items": [
+                    {
+                      "key": "arType",
+                      "type": "u8",
+                      "value": 0
+                    },
+                    {
+                      "key": 1919870413,
+                      "type": "embed",
+                      "value": {
+                        "items": [
+                          {
+                            "key": 3009062761,
+                            "type": "f32",
+                            "value": 0.0
+                          }
+                        ],
+                        "name": 3466301819
+                      }
+                    },
+                    {
+                      "key": 3299554640,
+                      "type": "embed",
+                      "value": {
+                        "items": [
+                          {
+                            "key": 3009062761,
+                            "type": "f32",
+                            "value": 0.5
+                          }
+                        ],
+                        "name": 3466301819
+                      }
+                    },
+                    {
+                      "key": 1159738299,
+                      "type": "embed",
+                      "value": {
+                        "items": [
+                          {
+                            "key": 3009062761,
+                            "type": "f32",
+                            "value": 0.001500000013038516
+                          }
+                        ],
+                        "name": 3466301819
+                      }
+                    }
+                  ],
+                  "name": "AbilityResourceSlotInfo"
+                }
+              },
+              {
+                "key": 1257508291,
+                "type": "embed",
+                "value": {
+                  "items": [
+                    {
+                      "key": 3009062761,
+                      "type": "f32",
+                      "value": 40.0
+                    }
+                  ],
+                  "name": 3466301819
+                }
+              },
+              {
+                "key": 3932225749,
+                "type": "embed",
+                "value": {
+                  "items": [
+                    {
+                      "key": 3009062761,
+                      "type": "f32",
+                      "value": 10.0
+                    }
+                  ],
+                  "name": 3466301819
+                }
+              },
+              {
+                "key": "CritDamageMultiplier",
+                "type": "f32",
+                "value": 1.0
+              },
+              {
+                "key": 3861749138,
+                "type": "embed",
+                "value": {
+                  "items": [
+                    {
+                      "key": 3009062761,
+                      "type": "f32",
+                      "value": 350.0
+                    }
+                  ],
+                  "name": 3466301819
+                }
+              },
+              {
+                "key": "BasicAttack",
+                "type": "embed",
+                "value": {
+                  "items": [
+                    {
+                      "key": "mAttackDelayCastOffsetPercent",
+                      "type": "option",
+                      "value": {
+                        "items": [
+                          0.0957999974489212
+                        ],
+                        "valueType": "f32"
+                      }
+                    }
+                  ],
+                  "name": "AttackSlotData"
+                }
+              },
+              {
+                "key": "ExpGivenOnDeath",
+                "type": "f32",
+                "value": 0.0
+              },
+              {
+                "key": "GoldGivenOnDeath",
+                "type": "f32",
+                "value": 0.0
+              },
+              {
+                "key": "PerceptionBubbleRadius",
+                "type": "option",
+                "value": {
+                  "items": [
+                    1.0
+                  ],
+                  "valueType": "f32"
+                }
+              },
+              {
+                "key": "Significance",
+                "type": "f32",
+                "value": 0.10000000149011612
+              },
+              {
+                "key": "Name",
+                "type": "string",
+                "value": "game_character_displayname_IceBlock"
+              },
+              {
+                "key": "MinimapIconOverride",
+                "type": "string",
+                "value": "NoIcon"
+              },
+              {
+                "key": "SelectionHeight",
+                "type": "f32",
+                "value": 100.0
+              },
+              {
+                "key": "SelectionRadius",
+                "type": "f32",
+                "value": 130.0
+              },
+              {
+                "key": "PathfindingCollisionRadius",
+                "type": "f32",
+                "value": 150.0
+              },
+              {
+                "key": "CharacterToolData",
+                "type": "embed",
+                "value": {
+                  "items": [
+                    {
+                      "key": "MapAiPresence",
+                      "type": "map",
+                      "value": {
+                        "items": [
+                          {
+                            "key": 0,
+                            "value": {
+                              "items": [],
+                              "name": "ToolAiPresence"
+                            }
+                          },
+                          {
+                            "key": 1,
+                            "value": {
+                              "items": [],
+                              "name": "ToolAiPresence"
+                            }
+                          },
+                          {
+                            "key": 2,
+                            "value": {
+                              "items": [],
+                              "name": "ToolAiPresence"
+                            }
+                          }
+                        ],
+                        "keyType": "u32",
+                        "valueType": "embed"
+                      }
+                    },
+                    {
+                      "key": "Description",
+                      "type": "string",
+                      "value": "game_character_description_IceBlock"
+                    },
+                    {
+                      "key": "BaseSpellEffectiveness",
+                      "type": "f32",
+                      "value": 1.0
+                    },
+                    {
+                      "key": "AttackSpeed",
+                      "type": "f32",
+                      "value": 1.600000023841858
+                    }
+                  ],
+                  "name": "CharacterToolData"
+                }
+              },
+              {
+                "key": "UseRiotRelationships",
+                "type": "bool",
+                "value": true
+              },
+              {
+                "key": "Flags",
+                "type": "u32",
+                "value": 8398280
+              }
+            ],
+            "name": "CharacterRecord"
+          }
+        },
+        {
+          "key": "Characters/TrundleWall/Skins/Meta",
+          "value": {
+            "items": [],
+            "name": "SkinCharacterMetaDataProperties"
+          }
+        }
+      ],
+      "keyType": "hash",
+      "valueType": "embed"
+    }
+  },
+  "linked": {
+    "type": "list",
+    "value": {
+      "items": [],
+      "valueType": "string"
+    }
+  },
+  "type": {
+    "type": "string",
+    "value": "PROP"
+  },
+  "version": {
+    "type": "u32",
+    "value": 3
+  }
+}

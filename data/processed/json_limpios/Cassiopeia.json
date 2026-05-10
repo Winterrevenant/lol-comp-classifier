@@ -1,0 +1,287 @@
+{
+    "nombre": "Cassiopeia",
+    "stats_base": {
+        "Vida": 630.0,
+        "Vida_por_nivel": 104.0,
+        "Regen_Vida": 1.100000023841858,
+        "Regen_Vida_por_nivel": 0.10000000149011612,
+        "Daño_Ataque": 53.0,
+        "Daño_Ataque_por_nivel": 3.0,
+        "Armadura": 18.0,
+        "Armadura_por_nivel": 4.699999809265137,
+        "Resistencia_Magica_por_nivel": 1.2999999523162842,
+        "Vel_Movimiento": 335.0,
+        "Rango_Ataque": 550.0,
+        "Vel_Ataque_base": 0.6470000147819519,
+        "Vel_Ataque_ratio": 0.6470000147819519,
+        "Vel_Ataque_por_nivel": 1.5,
+        "Mana": 480.0,
+        "Mana_por_nivel": 40.0,
+        "Regen_Mana": 1.600000023841858,
+        "Regen_Mana_por_nivel": 0.1599999964237213
+    },
+    "habilidades": {
+        "Q": {
+            "nombre": "CassiopeiaQAbility/CassiopeiaQ",
+            "cooldown": [
+                3.5,
+                3.5,
+                3.5,
+                3.5,
+                3.5,
+                3.5,
+                3.5
+            ],
+            "costo_mana": [
+                50.0,
+                55.0,
+                60.0,
+                65.0,
+                70.0,
+                70.0
+            ],
+            "rango": [
+                850.0,
+                850.0,
+                850.0,
+                850.0,
+                850.0,
+                850.0,
+                850.0
+            ],
+            "daño_base": [
+                30.0,
+                75.0,
+                110.0,
+                145.0,
+                180.0,
+                215.0,
+                250.0
+            ],
+            "escalado_1": 0.6499999761581421,
+            "escalado_2": 0.0,
+            "parametros_extra": {
+                "PoisonDuration": [
+                    3.0,
+                    3.0,
+                    3.0,
+                    3.0,
+                    3.0,
+                    3.0,
+                    3.0
+                ],
+                "ChampHitMSBonus": [
+                    25.0,
+                    30.0,
+                    35.0,
+                    40.0,
+                    45.0,
+                    50.0,
+                    50.0
+                ],
+                "ChampHitMSDuration": [
+                    3.0,
+                    3.0,
+                    3.0,
+                    3.0,
+                    3.0,
+                    3.0,
+                    3.0
+                ]
+            }
+        },
+        "W": {
+            "nombre": "CassiopeiaWAbility/CassiopeiaW",
+            "cooldown": [
+                24.0,
+                24.0,
+                22.0,
+                20.0,
+                18.0,
+                16.0,
+                14.0
+            ],
+            "costo_mana": [
+                70.0,
+                75.0,
+                80.0,
+                85.0,
+                90.0,
+                90.0
+            ],
+            "rango": [
+                25000.0,
+                25000.0,
+                25000.0,
+                25000.0,
+                25000.0,
+                25000.0,
+                25000.0
+            ],
+            "daño_base": [
+                20.0,
+                20.0,
+                25.0,
+                30.0,
+                35.0,
+                40.0,
+                45.0
+            ],
+            "escalado_1": 0.10000000149011612,
+            "escalado_2": 0.0,
+            "parametros_extra": {
+                "SlowPercent": [
+                    30.0,
+                    40.0,
+                    50.0,
+                    60.0,
+                    70.0,
+                    80.0,
+                    90.0
+                ],
+                "PoisonDuration": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "CloudDuration": [
+                    5.0,
+                    5.0,
+                    5.0,
+                    5.0,
+                    5.0,
+                    5.0,
+                    5.0
+                ]
+            }
+        },
+        "E": {
+            "nombre": "CassiopeiaEAbility/CassiopeiaE",
+            "cooldown": [
+                0.75,
+                0.75,
+                0.75,
+                0.75,
+                0.75,
+                0.75,
+                0.75
+            ],
+            "costo_mana": [
+                40.0,
+                40.0,
+                40.0,
+                40.0,
+                40.0,
+                40.0
+            ],
+            "rango": [
+                700.0,
+                700.0,
+                700.0,
+                700.0,
+                700.0,
+                700.0,
+                700.0
+            ],
+            "daño_base": [
+                -5.0,
+                20.0,
+                45.0,
+                70.0,
+                95.0,
+                120.0,
+                145.0
+            ],
+            "escalado_1": 0.10000000149011612,
+            "escalado_2": 0.10000000149011612,
+            "parametros_extra": {
+                "HealRatio": [
+                    0.08500000089406967,
+                    0.10000000149011612,
+                    0.11500000208616257,
+                    0.12999999523162842,
+                    0.14499999582767487,
+                    0.1599999964237213,
+                    0.17499999701976776
+                ],
+                "MinionReductionModifier": [
+                    0.25,
+                    0.25,
+                    0.25,
+                    0.25,
+                    0.25,
+                    0.25,
+                    0.25
+                ]
+            }
+        },
+        "R": {
+            "nombre": "CassiopeiaRAbility/CassiopeiaR",
+            "cooldown": [
+                120.0,
+                120.0,
+                100.0,
+                80.0,
+                10.0,
+                10.0,
+                10.0
+            ],
+            "costo_mana": [
+                100.0,
+                100.0,
+                100.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rango": [
+                825.0,
+                825.0,
+                825.0,
+                825.0,
+                825.0,
+                825.0,
+                700.0
+            ],
+            "daño_base": [
+                50.0,
+                150.0,
+                250.0,
+                350.0,
+                450.0,
+                550.0,
+                650.0
+            ],
+            "escalado_1": 0.5,
+            "escalado_2": 0.5,
+            "parametros_extra": {
+                "RCCDuration": [
+                    2.0,
+                    2.0,
+                    2.0,
+                    2.0,
+                    2.0,
+                    2.0,
+                    2.0
+                ],
+                "RSlowPercent": [
+                    40.0,
+                    40.0,
+                    40.0,
+                    40.0,
+                    40.0,
+                    40.0,
+                    40.0
+                ]
+            }
+        }
+    },
+    "pasiva": {
+        "nombre": "CassiopeiaPassiveAbility",
+        "descripcion": "game_buff_tooltip_CassiopeiaPassive"
+    }
+}

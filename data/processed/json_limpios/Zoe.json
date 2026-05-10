@@ -1,0 +1,15 @@
+{
+    "nombre": "TrundleWall",
+    "stats_base": {
+        "Vida": 500.0,
+        "Vida_por_nivel": 150.0,
+        "Regen_Vida": 0.5,
+        "Daño_Ataque": 40.0,
+        "Armadura": 10.0,
+        "Vel_Movimiento": 350.0,
+        "Mana": 0.0,
+        "Regen_Mana": 0.5
+    },
+    "habilidades": {},
+    "pasiva": {}
+}
